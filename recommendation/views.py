@@ -1,67 +1,73 @@
-from django.shortcuts import render
-from typing import Dict, Optional
-import logging
-import joblib
-from pymongo import MongoClient
-
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, HttpRequest
-from django.conf import settings
+
+from .models import Product
+from .utility import get_recommendations
+
 
 # Create your views here.
 
-logger = logging.getLogger(__name__)
+def home(request: HttpRequest):
+    return render(request, 'index.html')
 
 
-# Load the trained recommendation model
-model = joblib.load("recommendation_model.pkl")
-
-
-#TODO: Connect correctly your MongoDB connection
-
-# Connect to MongoDB
-client = MongoClient(settings.MONGO_CONNECTION_STRING)  # Replace with your MongoDB URI
-db = client[settings.MONGO_DB_NAME]
-collection = db[settings.MONGO_COLLECTION_NAME]  # Ensure this matches your actual collection name
-
-
-def get_product_details(product_id: int) -> Optional[Dict]:
+def recommend_products(request: HttpRequest, product_id: int):
     """
-    Fetch the shop name for a given item from MongoDB.
-
-    Parameters:
-    product_id (int): The unique identifier of the product.
-
-    Returns:
-    dict: A dictionary containing the product details if found, otherwise None.
-          The dictionary will contain the following keys: 'ProductID', 'ProductName', 'Category', 'Price', 'Rating', 'NumReviews', 'StockQuantity', 'Discount', 'Sales', 'DateAdded'.
-    """
-    item = collection.find_one({"ProductID": product_id})  # You can add other arguments here 'ProductName', 'Category', 'Price', 'Rating', 'NumReviews','StockQuantity', 'Discount', 'Sales', 'DateAdded'
-    return item if item else None
-
-
-def get_recommendations(request: HttpRequest, product_id: int) -> JsonResponse:
-    """
-    Returns recommended items and their shops.
+    Returns a rendered template with recommended items and their shops..
 
     Parameters:
     request (HttpRequest): The incoming request object.
     product_id (int): The ID of the product for which recommendations are requested.
 
     Returns:
-    JsonResponse: A JSON response containing the recommended items. If an error occurs, it returns a JSON response with an error message and a status code of 500.
-    """
+    HttpResponse: A rendered template containing the recommended items.    """
     try:
-        recommendations = model.similar_items(product_id, 5)  # Get top 5 similar items
+        product = get_object_or_404(Product, pk=product_id)
+        # Get recommended product IDs
+        recommended_ids = get_recommendations(product_id, top_n=5)
+        # Fetch Product instances for the recommended IDs
+        recommended_products = Product.objects.filter(id__in=recommended_ids)
 
-        recommended_items = []
-        for rec_id, _ in recommendations:
-            product = get_product_details(rec_id)  # Fetch shop from MongoDB
-            if product:
-                recommended_items.append(product)
+        context = {
+            "product": product,
+            "recommended_products": recommended_products
+        }
 
-        return JsonResponse({"recommended_items": recommended_items})
-
+        return render(request, "recommendations.html", context)
     except Exception as e:
-        logger.error(f"Error fetching recommendations: {e}")
-        return JsonResponse({"error": str(e)}, status=500)
+        # Handle any errors gracefully
+        return render(request, "error.html", {"error_message": str(e)})
 
+
+def search_and_recommend(request: HttpRequest):
+    """
+    Handle the search for a product by name and provide recommended similar products.
+    """
+    query = request.GET.get('q', '')  # Get the search query from the GET parameter (default to empty string)
+
+    # Search for product by name, case-insensitive match
+    products = Product.objects.filter(name__icontains=query)
+
+    if products.exists():
+        # If we have search results, pick the first match
+        product = products.first()
+
+        # Get recommended product IDs
+        recommended_ids = get_recommendations(product.id, top_n=5)
+
+        # Fetch recommended products from the database
+        recommended_products = Product.objects.filter(id__in=recommended_ids)
+
+        context = {
+            "product": product,
+            "recommended_products": recommended_products,
+            "search_query": query
+        }
+        return render(request, "recommendations.html", context)
+    else:
+        # No products found, return an empty result message
+        context = {
+            "error_message": f"No products found for '{query}'",
+            "search_query": query
+        }
+        return render(request, "search_result.html", context)

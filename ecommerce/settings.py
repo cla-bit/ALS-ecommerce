@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -55,7 +55,7 @@ ROOT_URLCONF = "ecommerce.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],  # Connect your templates here. Do not forget to do this
+        "DIRS": [BASE_DIR/"template"],  # Connect your templates here. Do not forget to do this
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -76,17 +76,27 @@ WSGI_APPLICATION = "ecommerce.wsgi.application"
 
 """
 Since you are using MongoDB, set your MongoDB database settings here. See below.
+Default to using sqlite3 as the database.
 """
+# Comment this to use the MongoDB database settings instead
 DATABASES = {
     'default': {
-        'ENGINE': 'djongo',  # Use 'djongo' if using Django ORM for MongoDB
-        'NAME': 'your_database_name',  # Ensure you use your MongoDB name here
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-# OR use pymongo directly (recommended for NoSQL)
-MONGO_CONNECTION_STRING = "mongodb://localhost:27017/"
-MONGO_DB_NAME = "your_database_name"
-MONGO_COLLECTION_NAME = "products"
+
+# Uncomment this to use the MongoDB settings
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'djongo',  # Use 'djongo' if using Django ORM for MongoDB
+#         'NAME': 'your_database_name',  # Ensure you use your MongoDB name here
+#     }
+# }
+# # OR use pymongo directly (recommended for NoSQL)
+# MONGO_CONNECTION_STRING = "mongodb://localhost:27017/"
+# MONGO_DB_NAME = "your_database_name"
+# MONGO_COLLECTION_NAME = "products"
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -122,7 +132,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR/"static"]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles/')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR/"media"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field

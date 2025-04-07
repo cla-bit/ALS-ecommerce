@@ -1,6 +1,11 @@
 from django.urls import path
-from .views import get_recommendations
+from .views import home, recommend_products, search_and_recommend
+
+
+app_name = 'recommendation'
 
 urlpatterns = [
-    path('recommendations/<int:product_id>/', get_recommendations, name='get_recommendations'),
+    path('', home, name='home'),
+    path('recommendations/<int:product_id>/', recommend_products, name='recommend_items'),
+    path('search/', search_and_recommend, name='search_products'),
 ]
