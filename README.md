@@ -3,7 +3,7 @@
 ----
 
 1. Clone the application from github.
-2. Setup and activate your virtual environment.
+2. Setup and activate your virtual environment. Note it uses `implicit` library, ensure your device has the requirements for it. See here for the requirements: https://benfred.github.io/implicit/installation.html#requirements
 3. Go into the project directory [ecommerce] and pip install the dependencies. Run `pip install -r requirements.txt`.
 4. Setup your MongoDB database, if you already have MongoDB installed or any database of your choice.
 5. Go into the project directory [ecommerce] >> settings.py, and connect your database settings to your MongoDB database or database of your choice.
