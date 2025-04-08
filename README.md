@@ -4,7 +4,7 @@
 
 1. Clone the application from github.
 2. Setup and activate your virtual environment.
-3. Go into the project directory [ecommerce] and pip install the dependencies.
+3. Go into the project directory [ecommerce] and pip install the dependencies. Run `pip install -r requrements.txt`.
 4. Setup your MongoDB database, if you already have MongoDB installed or any database of your choice.
 5. Go into the project directory [ecommerce] >> settings.py, and connect your database settings to your MongoDB database or database of your choice.
     > If you are using "djongo". ensure you pip install the library, the setup is there.
@@ -13,9 +13,15 @@
 
     > There is a provided dummy csv file that contains ecommerce products, which you can migrate into your MongoDB database.
 
-6. Go into the project directory [ecommerce] >> settings.py, and setup your templates.
+6. Go into the project directory [ecommerce] >> settings.py, and setup your templates. This has been done. Skip.
 7. Run the *makemigrations* and *migrate* command to fill up your database.
-8. For the UI, ensure you setup correctly the url in the template. See how to insert urls in django templates.
+Run these commands:
+```bash
+python manage.py makemigrations
+python manage.py migrate
+
+```
+8. (Optional) For the UI, ensure you setup correctly the url in the template. See how to insert urls in django templates.
 
     >> You can add this one in the javascript file (optional).
     ```javascript
@@ -42,10 +48,11 @@
     ```
 
 9. Run the `import_products.py` script `python manage.py import_products`
-10. Run the application to start up the app on your web browser.
-11. Test the server and the recommendation url "recommendations/product_id".
+10. Run the application to start up the app on your web browser. Run this command: `python manage.py runserver`.
+11. Open the server url on your browser and test.
 
 >   **Provided also are the following**: ecommerce_product_dataset.csv, ecommerce_recommendation_model.ipynb, ecommerce_recommendation_model.py & recommendation_model.pkl
+
 
 
 ---
