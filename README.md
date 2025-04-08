@@ -4,7 +4,7 @@
 
 1. Clone the application from github.
 2. Setup and activate your virtual environment.
-3. Go into the project directory [ecommerce] and pip install the dependencies. Run `pip install -r requrements.txt`.
+3. Go into the project directory [ecommerce] and pip install the dependencies. Run `pip install -r requirements.txt`.
 4. Setup your MongoDB database, if you already have MongoDB installed or any database of your choice.
 5. Go into the project directory [ecommerce] >> settings.py, and connect your database settings to your MongoDB database or database of your choice.
     > If you are using "djongo". ensure you pip install the library, the setup is there.
